@@ -9,20 +9,23 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import in.techfreak.movieinfoservice.model.Movie;
+import in.techfreak.movieinfoservice.model.MovieSummary;
 
 @RestController
 @RequestMapping("/movies")
 public class MovieResource {
-	
-	@Value("${api.key}")
-    private String apiKey;
 
-    @Autowired
-    private RestTemplate restTemplate;
-	
+	@Value("${api.key}")
+	private String apiKey;
+
+	@Autowired
+	private RestTemplate restTemplate;
+
 	@GetMapping("/{movieId}")
 	public Movie getMovieInfo(@PathVariable("movieId") String movieId) {
-		return new Movie(movieId, "3 Idiots","The Best Entertainer");
+		MovieSummary movieSummary = this.restTemplate.getForObject(
+				"https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey, MovieSummary.class);
+		return new Movie(movieId, movieSummary.getTitle(), movieSummary.getOverview());
 	}
 
 }
